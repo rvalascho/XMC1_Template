@@ -1,0 +1,17 @@
+#!/bin/bash
+
+echo "Removing Previous Files"
+rm -rf ./Build/AppSw
+rm -rf ./Build/BaseSw
+rm -rf ./Build/bin
+echo "Copying to Build Directory"
+cp -avr ./AppSw ./Build/AppSw
+cp -avr ./BaseSw ./Build/BaseSw
+echo "Cleaning Objects"
+find ./Build -name '*.o' -delete
+echo "Starting Build"
+cd ./Build
+scons -c
+scons -Q 
+arm-linux-gnu-size ./bin/XMC14_Proj.elf
+cd ..

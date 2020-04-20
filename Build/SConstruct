@@ -1,0 +1,180 @@
+# Scons setup for Cortex-M0
+# Robert Valascho 4-19-20
+# GNU ARM toolchain must be already in system path
+
+#include for function match
+import fnmatch
+#include for Scons
+import os
+
+#Setup environment variable for Scons
+env = Environment(ENV = os.environ)
+
+#Set the root path as this location
+rootPath = './'
+
+#variable that will determine all c and s file matches
+cmatches = []
+#variable that will determine all h file matches
+hmatches = []
+	
+#find all c files and put them in cmatches array
+for root, dirnames, filenames in os.walk(rootPath):
+  for filename in fnmatch.filter(filenames, '*.c'):
+#    print( os.path.join(root, filename))
+    cmatches.append(os.path.join(root, filename))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    cmatches.append(Glob(os.path.join(',\n')))
+
+#finda all a files and put them in cmatches array
+for root, dirnames, filenames in os.walk(rootPath):
+  for filename in fnmatch.filter(filenames, '*.a'):
+#    print( os.path.join(root, filename))
+    cmatches.append(os.path.join(root, filename))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    cmatches.append(Glob(os.path.join(',\n')))
+
+#find all s files and put them in cmatches array
+for root, dirnames, filenames in os.walk(rootPath):
+  for filename in fnmatch.filter(filenames, '*.S'):
+#    print( os.path.join(root, filename))
+    cmatches.append(os.path.join(root, filename))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    cmatches.append(Glob(os.path.join(',\n')))
+
+#in case debug is needed, you can print out the array
+#print("Here are the cmatches")	
+#print(cmatches)
+
+#find all h file folder matches in folders that are labeled inc
+for root, dirnames, filenames in os.walk(rootPath):
+  for dirname in fnmatch.filter(dirnames, 'inc'):
+#    print( os.path.join(root, dirname))
+    hmatches.append(os.path.join(root, dirname))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+#find all h file folder matches in folders that are labeled Include
+for root, dirnames, filenames in os.walk(rootPath):
+  for dirname in fnmatch.filter(dirnames, 'Include'):
+#    print( os.path.join(root, dirname))
+    hmatches.append(os.path.join(root, dirname))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+#find all h file folder matched in folders that are labeled Source
+for root, dirnames, filenames in os.walk(rootPath):
+  for dirname in fnmatch.filter(dirnames, 'Source'):
+#    print( os.path.join(root, dirname))
+    hmatches.append(os.path.join(root, dirname))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+#find all h file folder matches in folders that are labeled Config
+for root, dirnames, filenames in os.walk(rootPath):
+  for dirname in fnmatch.filter(dirnames, 'Config'):
+#    print( os.path.join(root, dirname))
+    hmatches.append(os.path.join(root, dirname))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+#find all h file folder matches in folders that are labeled Include1
+for root, dirnames, filenames in os.walk(rootPath):
+  for dirname in fnmatch.filter(dirnames, 'Include1'):
+#    print( os.path.join(root, dirname))
+    hmatches.append(os.path.join(root, dirname))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+    hmatches.append(os.path.join(root, '/usr/arm-linux-gnu/sys-root/usr/include/'))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+    hmatches.append(os.path.join(root, './BaseSw/CMSIS/Infineon'))
+#    matches.append(Glob(os.path.join(root, filename)[len(root)+1:]))
+    hmatches.append(Glob(os.path.join(',\n')))
+
+#in case debug is needed, you can print out the array
+#print("here are the header matches")	
+#print(hmatches)
+
+#set up all the related arm compiler calls
+env['AR'] = 'arm-linux-gnu-ar'
+env['AS'] = 'arm-linux-gnu-as'
+env['CC'] = 'arm-linux-gnu-gcc'
+env['CXX'] = 'arm-linux-gnu-g++'
+env['LINK'] = 'arm-linux-gnu-ld'
+env['RANLIB'] = 'arm-linux-gnu-ranlib'
+env['OBJCOPY'] = 'arm-linux-gnu-objcopy'
+env['PROGSUFFIX'] = '.elf'
+
+# include locations were searched for above, and are now used
+env['CPPPATH'] = hmatches
+
+#assembler flags
+env.Append(ASFLAGS = [
+    '-mcpu=cortex-m0', 
+    '-march=armv6-m',
+    '-msoft-float',
+	'-Wall',
+#	'-adhlns="$@.lst"',  
+#    '-mgeneral-regs-only',
+	'-c',
+	'-mthumb', 
+	'-g', 
+	'-gdwarf-2',
+])
+
+# compiler flags
+env.Append(CCFLAGS = [
+    '-mcpu=cortex-m0',          
+    '-march=armv6-m',
+    '-msoft-float',
+ #   '-mgeneral-regs-only',
+    '-O2',                      
+    '-ffunction-sections',      
+    '-fdata-sections',          
+    '-std=gnu99',               
+    '-fmessage-length=0',       
+	'-Wall',                    
+#	'-adhlns="$@.lst"', 
+	'-pipe',                    
+	'-c',                       
+	'-mthumb', 
+	'-g', 
+	'-gdwarf-2',
+#	'-x assembler-with-cpp',
+    ])
+
+# linker flags
+env.Append(LINKFLAGS = [
+	'-Map=./bin/XMC14_Proj.map', 
+    '-Tlinker_script.ld',
+	 '--gc-sections', 
+	 '-g', 
+    ]) 
+
+# custom defines
+env.Append(CPPDEFINES = [
+    'XMC1404_Q064x0200',
+    '__SKIP_LIBC_INIT_ARRAY',
+])
+
+# build everything
+prg = env.Program(
+    target = './bin/XMC14_Proj',
+	source = cmatches
+)
+
+# binary file builder
+def arm_generator(source, target, env, for_signature):
+    return '$OBJCOPY -O ihex %s %s'%(source[0], target[0])
+env.Append(BUILDERS = {
+    'Objcopy': Builder(
+        generator=arm_generator,
+        suffix='.hex',
+        src_suffix='.elf'
+    )
+})
+
+env.Objcopy(prg)
