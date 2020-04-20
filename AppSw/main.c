@@ -7,6 +7,7 @@
 #include <XMC1400.h>
 #include <xmc_gpio.h>
 
+//We will use P4.0 on XMC14 Boot Kit as indicator that template is working
 #define LED1 P4_0
 
 /**
@@ -20,6 +21,7 @@
 
 int main(void)
 {
+  //Set the LED Port to Output Push Pull
   XMC_GPIO_SetMode(LED1, XMC_GPIO_MODE_OUTPUT_PUSH_PULL);
 
   /* System timer configuration */
@@ -31,6 +33,7 @@ int main(void)
 
 }
 
+//Periodic handler to toggle the LED
 void SysTick_Handler(void)
 {
   XMC_GPIO_ToggleOutput(LED1);
